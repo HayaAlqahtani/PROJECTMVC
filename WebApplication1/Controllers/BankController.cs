@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
-//using System.Linq;
-//using System.Collections.Generic;
 
 namespace WebApplication1.Controllers
 {
     public class BankController : Controller
     {
         private static List<BankBranch> Branches = new List<BankBranch>
-        { 
+        {
             new BankBranch {Id=0,Name= "JaberBranch", Location="https://maps.app.goo.gl/skMjkovTH4YndNXc8?g_st=iw", BranchManager="nawaf", EmployeeCount= 50},
             new BankBranch {Id=1, Name= "QasrBranch", Location="https://maps.app.goo.gl/bbip7bmt6hna578z7?g_st=iw", BranchManager="talal", EmployeeCount= 70},
             new BankBranch {Id=2,Name= "KFHAuto", Location="https://maps.app.goo.gl/Ly4oSKPJvMU4SBgq6?g_st=iw", BranchManager="haya", EmployeeCount= 30}
@@ -19,7 +18,8 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
-            return View(Branches);
+            var context = new BankContext();
+            return View(context.BankBranches.ToList());
         }
 
         [HttpPost]
@@ -27,17 +27,20 @@ namespace WebApplication1.Controllers
         {
             if (ModelState.IsValid)
             {
-                var newBranch = new BankBranch
+                using (var context = new BankContext())
                 {
-                    Name = newBranchform.Name,
-                    Location = newBranchform.Location,
-                    BranchManager = newBranchform.BranchManager,
-                    EmployeeCount = newBranchform.EmployeeCount,
+                    var newBranch = new BankBranch
+                    {
+                        Name = newBranchform.Name,
+                        Location = newBranchform.Location,
+                        BranchManager = newBranchform.BranchManager,
+                        EmployeeCount = newBranchform.EmployeeCount,
 
+                    };
+                    context.BankBranches.Add(newBranch);
+                    context.SaveChanges();
+                }
 
-                };
-                Branches.Add(newBranch);
-                return RedirectToAction("Index");
             }
             return View(newBranchform);
         }
@@ -48,12 +51,59 @@ namespace WebApplication1.Controllers
         }
         public IActionResult Details(int id)
         {
-            var bankBranch = Branches.FirstOrDefault(b => b.Id == id);
-            if (bankBranch == null)
+            using (var context = new BankContext())
             {
-                return RedirectToAction("Index");
+                var bank = context.BankBranches.Find(id);
+                if (bank == null)
+                {
+                    return NotFound();
+                }
+                return View(bank);
             }
-            return View(bankBranch);
+
+        }
+        [HttpPost]
+        public IActionResult Edit(int id, NewBranchForm newBranchForm)
+        {
+            using (var context = new BankContext())
+            {
+                var bank = context.BankBranches.Find(id);
+                if (bank != null)
+                {
+                    //bank.Id = id;
+                    bank.Location  = newBranchForm.Location;    
+                    bank.BranchManager = newBranchForm.BranchManager;
+                    bank.EmployeeCount = newBranchForm.EmployeeCount;
+                    bank.Name = newBranchForm.Name;
+                    context.SaveChanges();
+                    return RedirectToAction("Index");
+
+                }
+            }
+            return View();
+        }
+
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            using (var context = new BankContext())
+            {
+                var bank = context.BankBranches.Find(id);
+                if (bank == null)
+                {
+                    return NotFound();
+                }
+                var form = new NewBranchForm();
+                form.Name = bank.Name;
+                form.BranchManager = bank.BranchManager;
+                form.EmployeeCount = bank.EmployeeCount;
+                form.Location = bank.Location;
+                return View(form);
+            }
+
         }
     }
 }
+
+
