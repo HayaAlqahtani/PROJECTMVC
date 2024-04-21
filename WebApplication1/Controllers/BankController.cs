@@ -18,7 +18,9 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
+
             var context = new BankContext();
+
             return View(context.BankBranches.ToList());
         }
 
@@ -70,7 +72,6 @@ namespace WebApplication1.Controllers
                 var bank = context.BankBranches.Find(id);
                 if (bank != null)
                 {
-                    //bank.Id = id;
                     bank.Location  = newBranchForm.Location;    
                     bank.BranchManager = newBranchForm.BranchManager;
                     bank.EmployeeCount = newBranchForm.EmployeeCount;
@@ -103,7 +104,39 @@ namespace WebApplication1.Controllers
             }
 
         }
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            using (var context = new BankContext())
+            {
+                var bank = context.BankBranches.Find(id);
+                if (bank == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                return View(bank);
+            }
+        }
+        [HttpPost]
+        public IActionResult Delete(int id, BankBranch bankBranch)
+        {
+            using (var context = new BankContext())
+            {
+                var bank = context.BankBranches.Find(id);
+                if(bank == null)
+                {
+                    return RedirectToAction("Index");
+
+                }
+                context.BankBranches.Remove(bank);
+                context.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+        
+
+        }
     }
-}
+
 
 
