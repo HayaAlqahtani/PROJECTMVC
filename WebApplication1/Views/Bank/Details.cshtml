@@ -23,4 +23,21 @@
         <th>Employee Count</th>
         <td>@Model.EmployeeCount</td>
     </tr>
+    <tr>
+        <th>Employee </th>
+    <th>
+        @foreach (var employee in Model.Employees)
+        {
+            <td>@employee.Name - @employee.Position - @employee.CivilId</td>
+        }
+    </th>
+    </tr>
+
+   
+    </dl>
+  
+
 </table>
+
+@Html.ActionLink("Delete", "Delete", new { id = Model.Id }, new { @class = "btn btn-danger" })
+@Html.ActionLink("AddEmployee", "AddEmployee", new { id = Model.Id }, new { @class = "btn btn-primary" })

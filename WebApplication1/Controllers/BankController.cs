@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
@@ -41,6 +42,7 @@ namespace WebApplication1.Controllers
                     };
                     context.BankBranches.Add(newBranch);
                     context.SaveChanges();
+                    return RedirectToAction("Index");
                 }
 
             }
@@ -55,10 +57,10 @@ namespace WebApplication1.Controllers
         {
             using (var context = new BankContext())
             {
-                var bank = context.BankBranches.Find(id);
+                var bank = context.BankBranches.Include(r=>r.Employees).SingleOrDefault(r=> r.Id == id);
                 if (bank == null)
                 {
-                    return NotFound();
+                    return RedirectToAction("Index");
                 }
                 return View(bank);
             }
@@ -72,7 +74,7 @@ namespace WebApplication1.Controllers
                 var bank = context.BankBranches.Find(id);
                 if (bank != null)
                 {
-                    bank.Location  = newBranchForm.Location;    
+                    bank.Location = newBranchForm.Location;
                     bank.BranchManager = newBranchForm.BranchManager;
                     bank.EmployeeCount = newBranchForm.EmployeeCount;
                     bank.Name = newBranchForm.Name;
@@ -123,7 +125,7 @@ namespace WebApplication1.Controllers
             using (var context = new BankContext())
             {
                 var bank = context.BankBranches.Find(id);
-                if(bank == null)
+                if (bank == null)
                 {
                     return RedirectToAction("Index");
 
@@ -133,10 +135,40 @@ namespace WebApplication1.Controllers
             }
             return RedirectToAction("Index");
         }
-        
 
+
+        [HttpPost]
+        public IActionResult AddEmployee(int Id, AddEmployeeForm addEmployeeForm)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var context = new BankContext();
+                var branch = context.BankBranches.Find(Id);
+                var newEmployee = new Employee();
+
+                newEmployee.Name = addEmployeeForm.Name;
+                newEmployee.CivilId = addEmployeeForm.CivilId;
+                newEmployee.Position = addEmployeeForm.Position;
+
+
+                branch.Employees.Add(newEmployee);
+                context.SaveChanges();
+                return RedirectToAction("Index");
+
+            }
+            return View(addEmployeeForm);
         }
+
+        [HttpGet]
+        public IActionResult AddEmployee(int Id)
+        {
+            return View();
+        }
+
     }
+
+}
 
 
 
