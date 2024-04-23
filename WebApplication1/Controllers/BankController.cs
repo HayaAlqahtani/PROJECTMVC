@@ -7,6 +7,13 @@ namespace WebApplication1.Controllers
 {
     public class BankController : Controller
     {
+        private readonly BankContext _context;
+
+        public BankController(BankContext context)
+        {
+            _context = context;
+        }
+
         private static List<BankBranch> Branches = new List<BankBranch>
         {
             new BankBranch {Id=0,Name= "JaberBranch", Location="https://maps.app.goo.gl/skMjkovTH4YndNXc8?g_st=iw", BranchManager="nawaf", EmployeeCount= 50},
@@ -20,7 +27,7 @@ namespace WebApplication1.Controllers
         public IActionResult Index()
         {
 
-            var context = new BankContext();
+            var context = _context;
 
             return View(context.BankBranches.ToList());
         }
@@ -30,7 +37,7 @@ namespace WebApplication1.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (var context = new BankContext())
+                using ( _context)
                 {
                     var newBranch = new BankBranch
                     {
@@ -40,8 +47,8 @@ namespace WebApplication1.Controllers
                         EmployeeCount = newBranchform.EmployeeCount,
 
                     };
-                    context.BankBranches.Add(newBranch);
-                    context.SaveChanges();
+                    _context.BankBranches.Add(newBranch);
+                    _context.SaveChanges();
                     return RedirectToAction("Index");
                 }
 
@@ -55,7 +62,7 @@ namespace WebApplication1.Controllers
         }
         public IActionResult Details(int id)
         {
-            using (var context = new BankContext())
+            using (var context = _context)
             {
                 var bank = context.BankBranches.Include(r=>r.Employees).SingleOrDefault(r=> r.Id == id);
                 if (bank == null)
@@ -69,7 +76,7 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public IActionResult Edit(int id, NewBranchForm newBranchForm)
         {
-            using (var context = new BankContext())
+            using (var context = _context)
             {
                 var bank = context.BankBranches.Find(id);
                 if (bank != null)
@@ -90,7 +97,7 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            using (var context = new BankContext())
+            using (var context = _context)
             {
                 var bank = context.BankBranches.Find(id);
                 if (bank == null)
@@ -109,7 +116,7 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            using (var context = new BankContext())
+            using (var context = _context)
             {
                 var bank = context.BankBranches.Find(id);
                 if (bank == null)
@@ -122,7 +129,7 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public IActionResult Delete(int id, BankBranch bankBranch)
         {
-            using (var context = new BankContext())
+            using (var context = _context)
             {
                 var bank = context.BankBranches.Find(id);
                 if (bank == null)
@@ -143,7 +150,7 @@ namespace WebApplication1.Controllers
 
             if (ModelState.IsValid)
             {
-                var context = new BankContext();
+                var context = _context;
                 var branch = context.BankBranches.Find(Id);
                 var newEmployee = new Employee();
 
