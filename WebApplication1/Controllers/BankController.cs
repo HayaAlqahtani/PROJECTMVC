@@ -26,10 +26,19 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
+            BankContext bankContext = _context;
+            var viewModel = new BankDashboardViewModel();
+            viewModel.TotalBranches = bankContext.BankBranches.Count();
+            viewModel.TotalEmployees = bankContext.BankBranches.Count();
+            viewModel.BranchWithMostEmployees = bankContext.BankBranches
+                .OrderByDescending(b => b.Employees.Count)
+                .FirstOrDefault();
+            viewModel.BranchList = bankContext.BankBranches
+                .Include(b => b.Employees)
+                .ToList();
 
-            var context = _context;
 
-            return View(context.BankBranches.ToList());
+            return View(viewModel);
         }
 
         [HttpPost]
