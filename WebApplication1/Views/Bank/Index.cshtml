@@ -3,7 +3,20 @@
 *@
 @{
 }
-@model List<BankBranch> 
+@model BankDashboardViewModel
+@{
+    ViewData["Title"] = "Bank Dashboard";
+}
+
+<h2>Bank Dashboard</h2>
+
+<div>
+    <p>Total Branches: @Model.TotalBranches</p>
+    <p>Total Employees: @Model.TotalEmployees</p>
+    <p>Branch with Most Employees: @Model.BranchWithMostEmployees?.Name (Employees: @Model.BranchWithMostEmployees?.Employees.Count)</p>
+</div>
+
+<h3>List of Branches</h3>
 <table class="table">
     <thead>
         <tr>
@@ -12,20 +25,22 @@
             <th>Branch Manager</th>
             <th>Employee Count</th>
             <th>Actions</th>
-
         </tr>
     </thead>
     <tbody>
-        @foreach (var branch in Model)
+        @foreach (var branch in Model.BranchList)
         {
             <tr>
                 <td><a href="@Url.Action("Details", "Bank", new { id = branch.Id })">@branch.Name</a></td>
                 <td><a href="@branch.Location">🗺️</a></td>
                 <td>@branch.BranchManager</td>
                 <td>@branch.EmployeeCount</td>
-                <td><a class="btn btn-primary" href="@Url.Action("Edit", "Bank", new { id = branch.Id })">Edit ✒️</a></td>
+                <td>
+                    <a class="btn btn-primary" href="@Url.Action("Edit", "Bank", new { id = branch.Id })">Edit ✒️</a>
+                    <a class="btn btn-danger" href="@Url.Action("Delete", "Bank", new { id = branch.Id })">Delete ❌</a>
+                </td>
             </tr>
         }
     </tbody>
-    
 </table>
+
