@@ -3,6 +3,7 @@
 *@
 @{
 }
+@* 
 @model BankDashboardViewModel
 @{
     ViewData["Title"] = "Bank Dashboard";
@@ -42,5 +43,126 @@
             </tr>
         }
     </tbody>
+
 </table>
 
+
+
+ *@
+
+
+@model BankDashboardViewModel
+@inject IViewLocalizer Localizer
+
+<h1>@Localizer["WelcomeMessage"]</h1>
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: 'Arial', sans-serif;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 50px auto;
+    }
+
+    .card {
+        background-color: #28a745;
+        color: #ffffff;
+    }
+
+    .card-title {
+        color: #ffffff;
+    }
+
+    .table th,
+    .table td {
+        border: 1px solid #28a745;
+        color: #000000;
+    }
+
+    .table th {
+        background-color: #28a745;
+        color: #ffffff;
+    }
+
+    .btn-primary {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+
+        .btn-primary:focus {
+            box-shadow: none;
+        }
+
+        .btn-primary:active {
+            background-color: #1e7e34;
+            border-color: #1c7430;
+        }
+
+        .btn-primary.disabled,
+        .btn-primary:disabled {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">@Localizer["Total Branches"]</h5>
+                    <p class="card-text">@Model.TotalBranches</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">@Localizer["Total Employees"]</h5>
+                    <p class="card-text">@Model.TotalEmployees</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>@Localizer["Branches"]</h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>@Localizer["Location Name"]</th>
+                    <th>@Localizer["Location URL"]</th>
+                    <th>@Localizer["Branch Manager"]</th>
+                    <th>@Localizer["Employee Count"]</th>
+                    <th>@Localizer["Actions"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var branch in Model.BranchList)
+                {
+                    <tr>
+                        <td><a href="@Url.Action("Details","Bank", new { id = branch.Id })">@branch.Name</a></td>
+                        <td><a href="@branch.Location" target="_blank">🌐</a></td>
+                        <td>@branch.BranchManager</td>
+                        <td>@branch.EmployeeCount</td>
+                        <td>
+                            <a href="@Url.Action("Edit","Bank", new { id = branch.Id })" class="btn btn-primary btn-sm">@Localizer["Edit"]</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+}
